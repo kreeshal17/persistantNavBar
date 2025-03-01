@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "660340606580",
+    "project_id": "persistancebottombar1",
+    "storage_bucket": "persistancebottombar1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:660340606580:android:171dbbb26c32cced73b321",
+        "android_client_info": {
+          "package_name": "com.krishal.persistancebottombar"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCE0iJUKPnRjvNje1AkHwGEEZDwqd4yTGQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
@@ -33,21 +35,24 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.krishal.persistancebottombar.AuthViewModel
 import com.krishal.persistancebottombar.R
 import com.krishal.persistancebottombar.constant
+import com.krishal.persistancebottombar.homeScreen
 import kotlinx.coroutines.delay
 
 
 @Composable
-  fun MainScreenn()
+  fun MainScreenn(authViewModel: AuthViewModel)
   {
+
       var navController = rememberNavController()
       Scaffold(
           bottomBar =
           {
               val currentRoute =
                   navController.currentBackStackEntryAsState().value?.destination?.route
-              if (currentRoute != constant.splash) {
+              if (currentRoute != constant.splash&&currentRoute !=constant.login &&currentRoute != constant.signUp) {
 
                   BottomAppBar(navController)
 
@@ -58,7 +63,7 @@ import kotlinx.coroutines.delay
 
 
           innerPadding->
-              NavGraphScreen(navController,modifier= Modifier.padding(innerPadding))
+              NavGraphScreen(navController,modifier= Modifier.padding(innerPadding),authViewModel)
 
       }
 
@@ -66,72 +71,47 @@ import kotlinx.coroutines.delay
   }
 
 @Composable
-fun NavGraphScreen(navController:NavHostController, modifier: Modifier) {
+fun NavGraphScreen(navController:NavHostController, modifier: Modifier,authViewModel: AuthViewModel) {
 
     NavHost(navController=navController, startDestination = constant.splash,modifier=modifier)
     {
-        composable(constant.splash){ splashScreen(navController)}
-        composable(constant.home){ homeScreen()}
-        composable(constant.setting){ SettingScreen()}
-        composable(constant.notification){ notification()}
-    }
+        composable(constant.splash){ splashScreen(navController,authViewModel)}
+        composable(constant.home){ homeScreen(authViewModel)}
+        composable(constant.setting){ SettingScreen(authViewModel,navController)}
+            composable(constant.notification){
 
 
+                notification(authViewModel,navController)}
+        composable(constant.login){ loginScreen(navController,authViewModel)}
+        composable(constant.signUp){signUp(navController,authViewModel)}
+//        composable("${constant.userProf}/{search}") { backStackEntry ->
+//            val search = backStackEntry.arguments?.getString("search") ?: ""
+//            userProfile(authViewModel, search)
 
-}
-
-
-
-
-@Composable
-fun splashScreen(navController: NavController)
-{
-
-    var scale= remember{
-        androidx.compose.animation.core.Animatable(0f)
-    }
-
-    LaunchedEffect(true) {
-        scale.animateTo(
-            targetValue = 1f,
-            animationSpec = tween(durationMillis = 5000,
-                easing = {
-                    OvershootInterpolator(2f).getInterpolation(it)
-                })
-        )
-        delay(200)
-        navController.navigate(constant.home) {
-            popUpTo(constant.splash){
-                inclusive=true
-            }
         }
-
-
-    }
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center)
-    {
-       Image(painter = painterResource(R.drawable.img), contentDescription = null, modifier = Modifier.scale(scale.value))
     }
 
 
 
-}
+
+
+
+
+
 
 @Composable
 fun BottomAppBar(navController: NavController) {
     var items = listOf(
 
         bottombarItems("Home", Icons.Default.Home,constant.home),
-                bottombarItems("Setting", Icons.Default.Settings,constant.setting),
-    bottombarItems("Notification", Icons.Default.Notifications,constant.notification),
+
+    bottombarItems("Search", Icons.Default.Search,constant.notification),
+        bottombarItems("profile", Icons.Default.Person,constant.setting),
 
         )
     var selectedItem by remember{
         mutableStateOf(0)
     }
-
-
-
 
     NavigationBar {
         items.forEachIndexed { index,item ->
@@ -148,8 +128,6 @@ fun BottomAppBar(navController: NavController) {
                             launchSingleTop = true
                             restoreState = true
                         }
-
-
 
 
                 },

@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.krishal.persistancebottombar" />
+                  <option name="mobileSdkAppId" value="1:660340606580:android:171dbbb26c32cced73b321" />
+                  <option name="projectId" value="persistancebottombar1" />
+                  <option name="projectNumber" value="660340606580" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

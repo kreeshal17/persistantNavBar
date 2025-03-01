@@ -14,6 +14,9 @@ const    val notification="notification"
      const      val setting="setting"
    const val home ="homescreen"
     const val splash= "splashScreen"
+    const val login ="loginScreen"
+    const val signUp ="signUpScreen"
+    const val userProf ="userprofile"
 }
 
 
