@@ -1,34 +1,36 @@
-package com.krishal.persistancebottombar
 
+package com.krishal.persistancebottombar
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.auth.User
+
 import com.google.firebase.firestore.toObject
 import com.krishal.persistancebottombar.MOdel.PostModel
 import com.krishal.persistancebottombar.MOdel.UserModel
 
- class AuthViewModel : ViewModel() {
+class AuthViewModel : ViewModel() {
     private val _searchedUser = MutableLiveData<UserModel?>()
     val searchedUser: MutableLiveData<UserModel?> = _searchedUser
     private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
-     private val _userpost =MutableLiveData<List<PostModel?>>()
-     val userPost : LiveData<List<PostModel?>> =_userpost
+    private val _userpost =MutableLiveData<List<PostModel?>>()
+    val userPost : LiveData<List<PostModel?>> =_userpost
 
 
 
-     private val _searchesuserPost = MutableLiveData<List<PostModel>>()
-     val searcheduserPost :LiveData<List<PostModel>> =_searchesuserPost
+    private val _searchesuserPost = MutableLiveData<List<PostModel>>()
+    val searcheduserPost :LiveData<List<PostModel>> =_searchesuserPost
 
-     private val _postStatus = MutableLiveData<String?>()
-     val postStatus: LiveData<String?> = _postStatus
+    private val _postStatus = MutableLiveData<String?>()
+    val postStatus: LiveData<String?> = _postStatus
 
 
 
@@ -37,6 +39,11 @@ import com.krishal.persistancebottombar.MOdel.UserModel
 
     private val _userData = MutableLiveData<UserModel?>()
     val userData: LiveData<UserModel?> = _userData
+
+
+
+    private val _allpost = MutableLiveData<List<PostModel?>>()
+    val allpost:LiveData<List<PostModel?>> = _allpost
     fun isUserAuthenticated():Boolean
     {
         return FirebaseAuth.getInstance().currentUser!=null
@@ -131,11 +138,11 @@ import com.krishal.persistancebottombar.MOdel.UserModel
 
     fun fetchUserFromName(name: String)
     {
-   if(name.isEmpty())
-   {
-       _searchedUser.value=null
-       return
-   }
+        if(name.isEmpty())
+        {
+            _searchedUser.value=null
+            return
+        }
         db.collection("users").whereEqualTo("name",name).get().addOnCompleteListener { task->
 
             if(task.isSuccessful)
@@ -156,134 +163,136 @@ import com.krishal.persistancebottombar.MOdel.UserModel
             }
         }
     }
-     fun fetchpostAByUserName(name: String) {
-         if (name.isEmpty()) {
-             _searchesuserPost.value = emptyList()
-             return
-         }
+    fun fetchpostAByUserName(name: String) {
+        if (name.isEmpty()) {
+            _searchesuserPost.value = emptyList()
+            return
+        }
 
-         db.collection("posts")
-             .whereEqualTo("name", name)
+        db.collection("posts")
+            .whereEqualTo("name", name)
 //             .orderBy("timeStamp", Query.Direction.DESCENDING)
-             .get()
-             .addOnCompleteListener { task ->
-                 if (task.isSuccessful) {
-                     val documents = task.result?.documents
-                     if (!documents.isNullOrEmpty()) {
-                         val posts = documents.mapNotNull { it.toObject(PostModel::class.java) }
-                         _searchesuserPost.value = posts
-                     } else {
-                         _searchesuserPost.value = emptyList()
-                     }
-                 } else {
-                     _searchesuserPost.value = emptyList()
-                 }
-             }
-     }
+            .get()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val documents = task.result?.documents
+                    if (!documents.isNullOrEmpty()) {
+                        val posts = documents.mapNotNull { it.toObject(PostModel::class.java) }
+                        _searchesuserPost.value = posts
+                    } else {
+                        _searchesuserPost.value = emptyList()
+                    }
+                } else {
+                    _searchesuserPost.value = emptyList()
+                }
+            }
+    }
 
 
 
-     //function to add postId
-      fun adPost(name:String,content:String,) {
-     val userId = auth.currentUser?.uid!!
+    //function to add postId
+    fun adPost(name:String,content:String,) {
+        val userId = auth.currentUser?.uid!!
 
-     val postId = db.collection("posts").document().id
-     val post = PostModel(postId, userId, name, content)
-     db.collection("posts").document(postId).set(post).addOnSuccessListener {
-         _postStatus.value = "added succesfully"
-
-
-     }.addOnFailureListener {
+        val postId = db.collection("posts").document().id
+        val post = PostModel(postId, userId, name, content)
+        db.collection("posts").document(postId).set(post).addOnSuccessListener {
+            _postStatus.value = "added succesfully"
 
 
-         _postStatus.value = "failed exception"
+        }.addOnFailureListener {
 
 
-     }
-
- }
-
-     //fetcvh all post of user
-     fun fetchAllPost()
-     {
-         val userId =auth.currentUser?.uid!!
-         if(userId.isEmpty())
-         {
-             _userpost.value= emptyList()
-             return
-         }
-         db.collection("posts").whereEqualTo("userId",userId).orderBy("timeStamp",com.google.firebase.firestore.Query.Direction.DESCENDING).get().addOnCompleteListener{
-
-             task->
-             if(task.isSuccessful)
-             {
-               val document=  task.result?.documents
-                 if(!document.isNullOrEmpty())
-                 {
-                     val post = document.mapNotNull { it.toObject(PostModel::class.java) }
-                        _userpost.value =post
+            _postStatus.value = "failed exception"
 
 
-                 }
-                 else{
-                     _userpost.value= emptyList()
+        }
 
-                 }
+    }
+
+    //fetcvh all post of user
+    fun fetchAllPost() {
+        val userId = auth.currentUser?.uid
+
+        // Check   if userId is null       or empty
+        if (userId.isNullOrEmpty()) {
+            _userpost.value = emptyList()
+            return
+        }
+
+        db.collection("posts")
+            .whereEqualTo("userId", userId)
+            .get()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val documents = task.result?.documents
+                    _userpost.value = documents?.mapNotNull { it.toObject(PostModel::class.java) } ?: emptyList()
+                } else {
+                    _userpost.value = emptyList()
+                }
+            }
+    }
 
 
-             }
-             else{
-                 _userpost.value= emptyList()
-             }
+    fun updateProfile(bio:String,name: String,onResult: (Boolean, String) -> Unit)
+    {
+        val userId=auth.currentUser?.uid!!
+        if(userId.isNullOrEmpty())
+        {
+            onResult(false," error occurs")
+            return
+        }
 
 
-         }
-
-
-     }
-
-
-//     fun fetchpostAByUserName(name:String)
-//     {
-//         if(name.isEmpty())
-//         {
-//             _searchesuserPost.value= emptyList()
-//             return
-//         }
-//
-//         db.collection("posts").whereEqualTo("name",name).orderBy("timeStamp",com.google.firebase.firestore.Query.Direction.DESCENDING).get().addOnCompleteListener {
-//             task->
-//             if (task.isSuccessful)
-//             {
-//                 val document=task.result?.documents
-//                 if(!document.isNullOrEmpty())
-//                 {
-//                     val post =document.mapNotNull { it.toObject(PostModel::class.java) }
-//                     _searchesuserPost.value
-//                 }
-//                 else{
-//                     _searchesuserPost.value= emptyList()
-//                 }
-//
-//
-//             }
-//             else{
-//                 _searchesuserPost.value= emptyList()
-//             }
-//
-//
-//         }
+        val update= mapOf(
+            "name" to name,
+            "bio" to bio
+        )
+        db.collection("users").document(userId).update(update).addOnCompleteListener {
+                task->
+            if(task.isSuccessful)
+            {
+                fetchUserData(userId)
+                onResult(true,"succesfully updated")
+            }
+            else{
+                val errormsg=task.exception?.localizedMessage
+                onResult(false,"error occurs,${errormsg}")
+            }
+        }
 
 
 
 
- }
+    }
+
+
+    fun fetchAlluserPost()
+    {
+
+        db.collection("posts").get().addOnCompleteListener {
+                task->
+            if(task.isSuccessful)
+            {
+                val document=task.result?.documents?: emptyList()
+
+                _allpost.value=document?.mapNotNull { it.toObject(PostModel::class.java) }
+
+            }
+            else{
+                _allpost.value= emptyList()
+            }
+
+        }
+
+
+    }
 
 
 
 
 
-
+}
 
 
 

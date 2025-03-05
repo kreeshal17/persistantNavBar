@@ -84,6 +84,11 @@ fun NavGraphScreen(navController:NavHostController, modifier: Modifier,authViewM
                 notification(authViewModel,navController)}
         composable(constant.login){ loginScreen(navController,authViewModel)}
         composable(constant.signUp){signUp(navController,authViewModel)}
+        composable(constant.friendlist){ friendList(authViewModel)}
+        composable(constant.profileedit){ profileedit(navController,authViewModel)}
+
+
+
 //        composable("${constant.userProf}/{search}") { backStackEntry ->
 //            val search = backStackEntry.arguments?.getString("search") ?: ""
 //            userProfile(authViewModel, search)

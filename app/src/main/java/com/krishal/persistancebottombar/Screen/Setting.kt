@@ -1,15 +1,17 @@
 package com.krishal.persistancebottombar.Screen
 
 import android.net.Uri
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.filled.People
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -20,7 +22,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -29,123 +31,183 @@ import coil.compose.AsyncImage
 import com.krishal.persistancebottombar.AuthViewModel
 import com.krishal.persistancebottombar.constant
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingScreen(authViewModel: AuthViewModel,navController: NavController) {
+fun SettingScreen(authViewModel: AuthViewModel, navController: NavController) {
     val user by authViewModel.userData.observeAsState()
-    val selectedImage by remember {
-        mutableStateOf<Uri?>(Uri.parse("https://wallpapers.com/images/featured/cool-profile-picture-87h46gcobjl5e4xu.jpg"))
-    }
+    val userpost by authViewModel.userPost.observeAsState(emptyList())
+    val selectedImage by remember { mutableStateOf<Uri?>(Uri.parse("https://wallpapers.com/images/featured/cool-profile-picture-87h46gcobjl5e4xu.jpg")) }
 
-    // Gradient Background
     val gradient = Brush.verticalGradient(
-        colors = listOf(Color(0xFF6A11CB), Color(0xFF2575FC)),
+        colors = listOf(Color(0xFF0F2027), Color(0xFF203A43), Color(0xFF2C5364)),
         startY = 0f,
-        endY = 800f
+        endY = 1000f
     )
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(gradient)
-            .padding(24.dp)
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text("Profile", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White) },
+                actions = {
+                    IconButton(onClick = {
+                        authViewModel.logout { navController.navigate(constant.login) }
+                    }) {
+                        Icon(imageVector = Icons.Default.Logout, contentDescription = "Logout", tint = Color.White)
+                    }
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigate(constant.friendlist)
+
+                    }) {
+                        Icon(imageVector =Icons.Default.People, contentDescription = null)
+
+                    }
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color(0xFF2C5364))
+            )
+        }
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(gradient)
+                .padding(paddingValues)
         ) {
-            // Profile Image with Edit Button
-            Box(
+            Column(
                 modifier = Modifier
-                    .size(160.dp)
-                    .shadow(16.dp, shape = CircleShape)
-                    .clip(CircleShape)
-                    .background(Color.White)
+                    .fillMaxSize()
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                AsyncImage(
-                    model = selectedImage,
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
-
-                // Edit Icon (Floating Action Button)
-                FloatingActionButton(
-                    onClick = { /* Handle image upload */ },
+                Box(
                     modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .size(40.dp),
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = Color.White
+                        .size(140.dp)
+                        .clip(CircleShape)
+                        .shadow(8.dp)
+                        .background(Color.White)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = "Edit Profile Picture"
+                    AsyncImage(
+                        model = selectedImage,
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
                     )
                 }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Welcome Message
-            Text(
-                text = if (user != null) "Hey ${user!!.name}!" else "Hey there!",
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White,
-                fontFamily = FontFamily.SansSerif
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = "Welcome to Your App",
-                fontSize = 20.sp,
-                color = Color.White.copy(alpha = 0.8f),
-                fontFamily = FontFamily.SansSerif
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-   user?.let {
-        Text(text="Your current Email is ${it.email}")
-   }
-            Spacer(modifier = Modifier.height(20.dp))
-            // User Details Card
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f))
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    user?.let {
-
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Text(
-                            text = " ${it.bio}",
-                            fontSize = 16.sp,
-                            color = Color.Black.copy(alpha = 0.8f),
-                            fontWeight = FontWeight.Medium
-                        )
-                    } ?: Text(
-                        text = "Loading user data...",
-                        fontSize = 16.sp,
-                        color = Color.Black.copy(alpha = 0.8f)
-                    )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(text = user?.name ?: "Hey there!", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(text = "Welcome to your profile", fontSize = 18.sp, color = Color.White.copy(alpha = 0.8f))
+                Spacer(modifier = Modifier.height(16.dp))
+                user?.let {
+                    Text(text = "Email: ${it.email}", fontSize = 16.sp, color = Color.White.copy(alpha = 0.8f))
                 }
-            }
-            Button(onClick = {authViewModel.logout {
-                navController.navigate(constant.login)
+                Spacer(modifier = Modifier.height(8.dp))
+                IconButton(onClick = {navController.navigate(constant.profileedit) }) {
+                    Icon(imageVector = Icons.Default.Edit, contentDescription = null)
+                }
+                Spacer(modifier = Modifier.height(24.dp))
 
-            } }) {
-                Text("Log Out")
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.15f))
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        user?.let {
+                            Text(text = it.bio, fontSize = 16.sp, color = Color.White.copy(alpha = 0.9f))
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+                        if (userpost.isEmpty()) {
+                            Text("No posts found.", fontSize = 16.sp, color = Color.LightGray)
+                        } else {
+                            LazyColumn(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                items(userpost) { post ->
+                                    Card(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        shape = RoundedCornerShape(12.dp),
+                                        colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.2f))
+                                    ) {
+                                        Column(modifier = Modifier.padding(16.dp)) {
+                                            if (post != null) {
+                                                Text(text = "Title: ${post.name}", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                                            }
+                                            if (post != null) {
+                                                Text(text = "Content: ${post.content}", fontSize = 16.sp, color = Color.White.copy(alpha = 0.9f))
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    onClick = { authViewModel.fetchAllPost() },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E88E5), contentColor = Color.White)
+                ) {
+                    Text("Show Your Posts")
+                }
             }
         }
     }
+}
+
+
+@Composable
+fun profileedit(navController: NavController,authViewModel: AuthViewModel)
+{
+     var context= LocalContext.current
+    var bio by remember {
+        mutableStateOf("")
+    }
+    var name by remember {
+        mutableStateOf("")
+    }
+    Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+
+        OutlinedTextField(value =bio, onValueChange = { bio=it }, label = {
+            Text(text = "enter your new bio")
+        })
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedTextField(value =name, onValueChange = { name =it }, label = {
+            Text(text = "enter your new name ")
+        })
+        Spacer(modifier = Modifier.height(24.dp))
+        Button(onClick = {
+            authViewModel.updateProfile(bio,name)
+            {
+                success,failure->
+                if(success)
+                {
+                   Toast.makeText(context,"successfullly updated",Toast.LENGTH_SHORT).show()
+                    navController.navigate(constant.setting)
+                    {
+                        popUpTo(constant.profileedit)
+                        {
+                            inclusive=false
+                        }
+                    }
+                }
+                else{
+                    Toast.makeText(context,"error try later",Toast.LENGTH_SHORT).show()
+                }
+            }
+
+        }) {
+            Text(text="update")
+        }
+
+    }
+
+
 }

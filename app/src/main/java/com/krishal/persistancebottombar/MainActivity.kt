@@ -12,12 +12,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.krishal.persistancebottombar.AuthViewModel
 import com.krishal.persistancebottombar.Screen.MainScreenn
 import com.krishal.persistancebottombar.ui.theme.PersistanceBottombarTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        val viewmodel:AuthViewModel by viewModels()
+        val viewmodel: AuthViewModel by viewModels()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {

@@ -17,6 +17,8 @@ const    val notification="notification"
     const val login ="loginScreen"
     const val signUp ="signUpScreen"
     const val userProf ="userprofile"
+    const val  friendlist ="friendlist button"
+    const val profileedit= "edit "
 }
 
 

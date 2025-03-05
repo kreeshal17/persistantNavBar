@@ -9,4 +9,5 @@ val    password: String="",
     val bio: String="",
 //    val selectedImage: String="",
     val userid: String= ""
+
 )

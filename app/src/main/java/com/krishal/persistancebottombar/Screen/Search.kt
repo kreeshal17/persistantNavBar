@@ -128,12 +128,16 @@ fun notification(authViewModel: AuthViewModel, navController: NavController) {
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
 
+
                         Text(
                             text = user.bio,
                             fontSize = 16.sp,
                             color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
                             modifier = Modifier.padding(top = 4.dp)
                         )
+                        Button(onClick = { }) {
+                            Text(text="Add as a friend")
+                        }
                     }
                 }
 
